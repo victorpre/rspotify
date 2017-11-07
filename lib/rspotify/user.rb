@@ -492,5 +492,13 @@ module RSpotify
       return response if RSpotify.raw_response
       response['devices'].map { |i| Device.new i }
     end
+
+    def player
+      url = "me/player"
+      response = RSpotify.resolve_auth_request(@id, url)
+
+      return response if RSpotify.raw_response
+      Player.new(self, response)
+    end
   end
 end
