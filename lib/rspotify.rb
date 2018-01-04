@@ -9,6 +9,7 @@ module RSpotify
   autoload :Category,           'rspotify/category'
   autoload :Device,             'rspotify/device'
   autoload :Player,             'rspotify/player'
+  autoload :TrackLink,          'rspotify/track_link'
   autoload :Playlist,           'rspotify/playlist'
   autoload :Recommendations,    'rspotify/recommendations'
   autoload :RecommendationSeed, 'rspotify/recommendation_seed'
