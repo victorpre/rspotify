@@ -22,11 +22,16 @@ module RSpotify
       is_playing
     end
 
-    def play(device_id = nil, song_uris)
+    def play(device_id = nil, media='tracks', uris)
       url = "me/player/play"
       url = device_id.nil? ? url : url+"?device_id=#{device_id}"
+      request_body = {}
 
-      request_body = {"uris": [song_uris]}
+      if media == 'tracks'
+        request_body = {"uris": uris}
+      elsif media == 'context'
+        request_body = {"context_uri": uris}
+      end
       User.oauth_put(@user.id, url, request_body.to_json)
     end
 
