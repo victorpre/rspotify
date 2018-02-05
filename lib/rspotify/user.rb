@@ -115,73 +115,6 @@ module RSpotify
       Playlist.new response
     end
 
-    def currently_playing
-      url = "me/player/currently-playing"
-      response = RSpotify.resolve_auth_request(@id, url)
-      return response if RSpotify.raw_response
-      Track.new response["item"]
-    end
-
-    # Allow browser to trigger playback in the user's currently active spotify app.
-    # User must be a premium subscriber for this feature to work.
-    def play_track(song_uri)
-      url = "me/player/play"
-      params = {"uris": [song_uri]}
-      User.oauth_put(@id, url, params.to_json)
-    end
-
-    # Play the user's currently active player
-    #
-    # @example
-    #           player = user.player
-    #           player.play
-    def play
-      url = 'me/player/play'
-      User.oauth_put(@id, url, {})
-    end
-
-    # Pause the user's currently active player
-    #
-    # @example
-    #           player = user.player
-    #           player.pause
-    def pause
-      url = 'me/player/pause'
-      User.oauth_put(@id, url, {})
-    end
-
-    # Get the current user’s player
-    #
-    # @example
-    #           player = user.player
-    def player
-      url = 'me/player'
-      User.oauth_get(@id, url)
-    end
-
-    # Get the current user’s recently played tracks. Requires the *user-read-recently-played* scope.
-    #
-    # @param limit  [Integer] Optional. The number of entities to return. Default: 20. Minimum: 1. Maximum: 50.
-    # @return [Array<Track>]
-    #
-    # @example
-    #           recently_played = user.recently_played
-    #           recently_played.size       #=> 20
-    #           recently_played.first.name #=> "Ice to Never"
-    def recently_played(limit: 20)
-      url = "me/player/recently-played?limit=#{limit}"
-      response = RSpotify.resolve_auth_request(@id, url)
-      return response if RSpotify.raw_response
-
-      json = RSpotify.raw_response ? JSON.parse(response) : response
-      json['items'].map do |t|
-        data = t['track']
-        data['played_at'] = t['played_at']
-        data['context_type'] = t['context']['type'] if t['context']
-        Track.new data
-      end
-    end
-
     # Add the current user as a follower of one or more artists, other Spotify users or a playlist. Following artists or users require the *user-follow-modify*
     # scope. Following a playlist publicly requires the *playlist-modify-public* scope; following it privately requires the *playlist-modify-private* scope.
     #
@@ -519,6 +452,18 @@ module RSpotify
 
       return response if RSpotify.raw_response
       response['devices'].map { |i| Device.new i }
+    end
+
+    # Get the current user’s player
+    #
+    # @example
+    #           player = user.player
+    def player
+      url = "me/player"
+      response = User.oauth_get(@id, url)
+
+      return response if RSpotify.raw_response
+      Player.new(self, response)
     end
   end
 end
