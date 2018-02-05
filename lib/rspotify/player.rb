@@ -66,35 +66,35 @@ module RSpotify
 
       User.oauth_put(@user.id, url, {}.to_json)
     end
-  end
 
-  def currently_playing
-    url = "me/player/currently-playing"
-    response = RSpotify.resolve_auth_request(@user.id, url)
-    return response if RSpotify.raw_response
-    Track.new response["item"]
-  end
+    def currently_playing
+      url = "me/player/currently-playing"
+      response = RSpotify.resolve_auth_request(@user.id, url)
+      return response if RSpotify.raw_response
+      Track.new response["item"]
+    end
 
-  # Get the current user’s recently played tracks. Requires the *user-read-recently-played* scope.
-  #
-  # @param limit  [Integer] Optional. The number of entities to return. Default: 20. Minimum: 1. Maximum: 50.
-  # @return [Array<Track>]
-  #
-  # @example
-  #           recently_played = user.recently_played
-  #           recently_played.size       #=> 20
-  #           recently_played.first.name #=> "Ice to Never"
-  def recently_played(limit: 20)
-    url = "me/player/recently-played?limit=#{limit}"
-    response = RSpotify.resolve_auth_request(@id, url)
-    return response if RSpotify.raw_response
+    # Get the current user’s recently played tracks. Requires the *user-read-recently-played* scope.
+    #
+    # @param limit  [Integer] Optional. The number of entities to return. Default: 20. Minimum: 1. Maximum: 50.
+    # @return [Array<Track>]
+    #
+    # @example
+    #           recently_played = user.recently_played
+    #           recently_played.size       #=> 20
+    #           recently_played.first.name #=> "Ice to Never"
+    def recently_played(limit: 20)
+      url = "me/player/recently-played?limit=#{limit}"
+      response = RSpotify.resolve_auth_request(@id, url)
+      return response if RSpotify.raw_response
 
-    json = RSpotify.raw_response ? JSON.parse(response) : response
-    json['items'].map do |t|
-      data = t['track']
-      data['played_at'] = t['played_at']
-      data['context_type'] = t['context']['type'] if t['context']
-      Track.new data
+      json = RSpotify.raw_response ? JSON.parse(response) : response
+      json['items'].map do |t|
+        data = t['track']
+        data['played_at'] = t['played_at']
+        data['context_type'] = t['context']['type'] if t['context']
+        Track.new data
+      end
     end
   end
 end
