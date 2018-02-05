@@ -515,8 +515,7 @@ module RSpotify
     #           devices.first.id #=> "5fbb3ba6aa454b5534c4ba43a8c7e8e45a63ad0e"
     def devices
       url = "me/player/devices"
-      response = User.oauth_get(@id, url)
-
+      response = RSpotify.resolve_auth_request(@id, url)
 
       return response if RSpotify.raw_response
       response['devices'].map { |i| Device.new i }
